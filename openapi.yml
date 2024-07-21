@@ -1,0 +1,176 @@
+openapi: 3.0.0
+info:
+  title: Currency Exchange Service API
+  version: 1.0.0
+  description: API for managing user accounts and currency exchange between PLN and USD.
+
+paths:
+  /accounts:
+    post:
+      summary: Create a new account
+      requestBody:
+        description: Account details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountCommand'
+      responses:
+        '200':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /accounts/{pesel}:
+    get:
+      summary: Get user details by PESEL
+      parameters:
+        - name: pesel
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /accounts/exchange:
+    post:
+      summary: Exchange currency for a specific account
+      requestBody:
+        description: Currency exchange details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExchangeCurrencyCommand'
+      responses:
+        '200':
+          description: Currency exchanged successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        balance:
+          type: number
+        currency:
+          type: string
+          enum:
+            - PLN
+            - USD
+      required:
+        - balance
+        - currency
+
+    User:
+      type: object
+      properties:
+        pesel:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+      required:
+        - pesel
+        - firstName
+        - lastName
+        - accounts
+
+    CreateAccountCommand:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        pesel:
+          type: string
+        initialBalance:
+          type: number
+      required:
+        - firstName
+        - lastName
+        - pesel
+        - initialBalance
+
+    ExchangeCurrencyCommand:
+      type: object
+      properties:
+        pesel:
+          type: string
+        amount:
+          type: number
+        fromCurrency:
+          type: string
+          enum:
+            - PLN
+            - USD
+        toCurrency:
+          type: string
+          enum:
+            - PLN
+            - USD
+      required:
+        - pesel
+        - amount
+        - fromCurrency
+        - toCurrency
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string

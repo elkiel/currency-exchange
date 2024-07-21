@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: currency-exchange
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:postgresql://0.0.0.0:5432/currency_exchange
+    username: user
+    password: 123456
+  jackson:
+    default-property-inclusion: non_null
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+    generator:
+      write_bigdecimal_as_plain: true
+    serialization:
+      indent_output: true
+    deserialization:
+      fail-on-unknown-properties: false
+  flyway:
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    locations: classpath:src/main/resources/flyway
+    schemas: buddy
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+server:
+  port: 8080
+  internal:
+    http:
+      auth:
+        username: admin
+        password: 123456
+
+nbp:
+  api:
+    url: https://api.nbp.pl/api/exchangerates/rates/C/USD
